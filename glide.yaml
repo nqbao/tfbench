@@ -1,0 +1,9 @@
+package: github.com/nqbao/tfbench
+import:
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: google.golang.org/grpc
+  version: ^1.4.1
+- package: github.com/gavv/monotime
+- package: go get gopkg.in/cheggaaa/pb.v1
