@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gavv/monotime"
 	"google.golang.org/grpc"
+	"github.com/montanaflynn/stats"
 	"sync"
 	pb "tensorflow_serving/apis"
 	"time"
@@ -39,10 +40,27 @@ type BenchmarkSummary struct {
 	Progress    chan float32
 }
 
-func (bmSummary *BenchmarkSummary) CalculateRPS() (rps float64) {
+func (bmSummary *BenchmarkSummary) CalculateRPS() (float64) {
 	duration := time.Now().UTC().Sub(bmSummary.StartedTime)
 
 	return float64(bmSummary.Runs) / duration.Seconds()
+}
+
+func (bmSummary *BenchmarkSummary) PrintSummary() {
+	var responsesTime stats.Float64Data = make(stats.Float64Data, len(bmSummary.Responses))
+	for i, v := range bmSummary.Responses {
+		responsesTime[i] = 1000 * v.Duration.Seconds()
+	}
+
+	totalSecs := bmSummary.EndedTime.Sub(bmSummary.StartedTime).String()
+	fmt.Printf("\nTotal time: %v", totalSecs)
+
+	percentiles := []int32{50, 66, 75, 80, 90, 95, 98, 99, 100}
+	fmt.Print("\n\nRequest percentiles:\n")
+	for _, i := range percentiles {
+		v, _ := responsesTime.Percentile(float64(i))
+		fmt.Printf("    %d%%: %.0f\n", i, v)
+	}
 }
 
 func NewBenchmarkRequest(server string, predictRequest *pb.PredictRequest) (bmRequest *BenchmarkRequest) {

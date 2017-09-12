@@ -58,8 +58,8 @@ func main() {
 
 	done := false
 
-	fmt.Printf("Benchmark Settings:\n")
-	fmt.Printf("-Server: %v\n- Input file: %v\n- Runs : %v\n- Clients: %v\n- Concurrency: %v\n\n",
+	fmt.Print("Benchmark Settings:\n")
+	fmt.Printf("- Server: %v\n- Input file: %v\n- Runs : %v\n- Clients: %v\n- Concurrency: %v\n\n",
 		hostName, inputFile, bmRequest.Runs, bmRequest.Clients, bmRequest.Concurrency,
 	)
 
@@ -82,4 +82,6 @@ func main() {
 		}
 	}
 	bar.Finish()
+
+	summary.PrintSummary()
 }
